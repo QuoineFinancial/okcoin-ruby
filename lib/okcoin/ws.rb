@@ -9,7 +9,7 @@ class Okcoin
       @secret_key = secret_key
     end
 
-    public 
+    public
       # When WebSocket is opened, register callbacks
       def on_open
        puts "Websocket connection to #{BASE_URI} established succesfully"
@@ -17,7 +17,7 @@ class Okcoin
 
       # When raw WebSocket message is received
       def on_message(msg)
-        puts "Message received: #{msg}"
+        @action.call if @action
       end
 
       # When WebSocket is closed
@@ -48,6 +48,12 @@ class Okcoin
 
       def price_api(data)
         @driver.text data
+      end
+
+      def trades(action)
+        @action = action
+        post_data = initial_post_data
+        emit(event: 'addChannel', channel: 'ok_sub_spotusd_trades', post_data: post_data)
       end
 
     private
