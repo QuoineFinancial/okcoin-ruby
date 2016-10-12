@@ -17,7 +17,7 @@ class Okcoin
 
       # When raw WebSocket message is received
       def on_message(msg)
-        @action.call if @action
+        @action.call(msg) if @action
       end
 
       # When WebSocket is closed
