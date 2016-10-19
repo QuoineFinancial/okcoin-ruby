@@ -50,7 +50,7 @@ class Okcoin
         post_data["symbol"] = pair
         post_data["type"] = type
         post_data["amount"] = amount
-        post_data["price"] = price
+        post_data["price"] = price if type != "sell_market"
 
         post_request post_data: post_data, action: "/v1/trade.do"
       end
@@ -132,6 +132,17 @@ class Okcoin
         post_request post_data: post_data, action: "/v1/account_records.do"
       end
 
+      def spot_order_history(pair: 'btc_usd', status:, current_page: 1, page_length: 50)
+        post_data = initial_post_data
+
+        post_data['symbol'] = pair
+        post_data['status'] = status
+        post_data['current_page'] = current_page
+        post_data['page_length'] = page_length
+
+        post_request post_data: post_data, action: "/v1/order_history.do"
+      end
+
       # Futures Price API
 
       def futures_ticker(pair: "btc_usd", contract_type: "this_week")
@@ -187,7 +198,7 @@ class Okcoin
 
       def futures_trade(pair:, amount:, type:, contract_type:, match_price:, price: nil, lever_rate: 10)
         post_data = initial_post_data
-        
+
         post_data["symbol"] = pair
         post_data["contract_type"] = contract_type
         post_data["amount"] = amount
@@ -240,7 +251,7 @@ class Okcoin
         post_request post_data: post_data, action: "/v1/future_explosive.do"
       end
 
-    private 
+    private
 
       def logger
         @logger ||= Object.const_defined?(:Rails) ? Rails.logger : Logger.new(STDOUT)
@@ -269,7 +280,7 @@ class Okcoin
         post_data["sign"] = signature
 
         payload = post_data.sort.collect{|k, v| "#{k}=#{v}"} * '&'
-        
+
         handle_timeouts do
           request = Curl.post(BASE_URI + action, payload) do |request|
             request.headers['Content-type'] = 'application/x-www-form-urlencoded'
