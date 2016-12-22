@@ -10,7 +10,14 @@ class Okcoin
 
     public
 
-      # Spot Price API
+      def order_fee(pair: "btc_usd", order_id:)
+        post_data = initial_post_data
+
+        post_data["symbol"] = pair
+        post_data["order_id"] = order_id
+
+        post_request post_data: post_data, action: "/v1/order_fee.do"
+      end
 
       def spot_ticker(pair: "btc_usd")
         query = { "symbol" => pair }
